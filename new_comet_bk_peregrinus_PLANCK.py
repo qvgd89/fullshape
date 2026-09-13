@@ -441,17 +441,16 @@ for tracer in tracers:
 #   Emulator(calculator, space, budget=N).train(checkpoint=<npz>)  builds + trains
 #   emulator.write(<h5>)                                           saves final result
 #   Emulator.read(<h5>)                                            loads it back
-# File suffix changed from '_derived.h5' to '.h5'.
 import glob as _glob
 from desilike.emulators import Emulator, Space
 
 def find_reusable_emulator(pattern, kidxs, req):
     """Return the smallest cached emulator that covers `req` (all parsed k-cuts
     >= req), or None. `kidxs` are the field indices of the k-cuts in the
-    underscore-split basename (sans the '.h5' suffix)."""
+    underscore-split basename (sans the '_derived.h5' suffix)."""
     best, best_key = None, None
     for fn in _glob.glob(pattern):
-        parts = os.path.basename(fn)[:-len('.h5')].split('_')
+        parts = os.path.basename(fn)[:-len('_derived.h5')].split('_')
         try:
             kv = [float(parts[i]) for i in kidxs]
         except (IndexError, ValueError):
@@ -469,15 +468,15 @@ if set_emulator:
             obs = observables[tracer][comp]
             theory = theories[tracer][comp]
             edir = f'./Emulators/Emulator_{comp}'
-            pattern = f'{edir}/{comp}_emu_{tracer}_z{z}_*_Afull_{A_full_status}_{pt_model}_{model}_{short_name}.h5'
+            pattern = f'{edir}/{comp}_emu_{tracer}_z{z}_*_Afull_{A_full_status}_{pt_model}_{model}_{short_name}_derived.h5'
             if comp == 'ps':
-                emu_fn = f'{edir}/{comp}_emu_{tracer}_z{z}_{kr_max}_Afull_{A_full_status}_{pt_model}_{model}_{short_name}.h5'
+                emu_fn = f'{edir}/{comp}_emu_{tracer}_z{z}_{kr_max}_Afull_{A_full_status}_{pt_model}_{model}_{short_name}_derived.h5'
                 kidxs, req = [4], [kr_max]                       # basename field: ...z{z}_{kmax}_Afull...
             else:
                 # Use the ACTUAL B2 cut in the name/req (was clamped to 0.08 before,
                 # which mislabeled B2=0.03 emulators as 0.08 and caused false reuse
                 # across different B2 cuts). Existing files renamed 0.08 -> 0.03.
-                emu_fn = f'{edir}/{comp}_emu_{tracer}_z{z}_{kr_max}_{kr_b0_max}_{kr_b2_max}_Afull_{A_full_status}_{pt_model}_{model}_{short_name}.h5'
+                emu_fn = f'{edir}/{comp}_emu_{tracer}_z{z}_{kr_max}_{kr_b0_max}_{kr_b2_max}_Afull_{A_full_status}_{pt_model}_{model}_{short_name}_derived.h5'
                 kidxs, req = [4, 5, 6], [kr_max, kr_b0_max, kr_b2_max]   # {kmax}_{kb0}_{kb2}
             os.makedirs(edir, exist_ok=True)
 
@@ -489,7 +488,7 @@ if set_emulator:
             else:
                 print(f"Fitting {comp.upper()} emulator for {tracer} -> {emu_fn} "
                       f"(no cache covers k-cuts={req})")
-                emu_checkpoint = emu_fn.replace('.h5', '_checkpoint.npz')
+                emu_checkpoint = emu_fn.replace('_derived.h5', '_checkpoint.npz')
                 emulator = Emulator(theory.pt, Space(theory.pt), budget=4)
                 emulator.train(checkpoint=emu_checkpoint)
                 if MPI.COMM_WORLD.rank == 0:
