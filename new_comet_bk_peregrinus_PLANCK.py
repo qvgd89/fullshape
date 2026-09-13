@@ -280,9 +280,9 @@ for p in cosmo_vc:
     elif name == 'logA':
         p.update(fixed=False, prior={'dist': 'uniform', 'limits': [2.0, 4.0]})
     elif name == 'm_ncdm':
-        p.update(fixed=False, prior={'dist': 'uniform', 'limits': [-0.33333, 0.33333]}, fd_eps = 0.16)
-        # p.update(fixed=False, prior={'dist': 'uniform', 'limits': [-0.33333, 0.33333]}, fd_eps = [0.00333, 0.16, 0.16])
-        # p.update(fixed=False, prior={'dist': 'uniform', 'limits': [0, 0.33333]}, fd_eps = 0.07)
+        p.update(fixed=False, prior={'dist': 'uniform', 'limits': [-0.33333, 0.33333]}, fd={'eps': 0.16})
+        # p.update(fixed=False, prior={'dist': 'uniform', 'limits': [-0.33333, 0.33333]}, fd={'eps': [0.00333, 0.16, 0.16]})
+        # p.update(fixed=False, prior={'dist': 'uniform', 'limits': [0, 0.33333]}, fd={'eps': 0.07})
 
 # Derived cosmology params surfaced in the chain (updated desilike computes these
 # in-pipeline, so sigma8 no longer needs emulator post-processing). See
