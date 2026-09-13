@@ -495,7 +495,11 @@ if set_emulator:
                 emulator.train(checkpoint=emu_checkpoint)
                 if MPI.COMM_WORLD.rank == 0:
                     emulator.write(emu_fn)
-            replace(obs, theory.pt, emulator.to_calculator())
+            emu_calc = emulator.to_calculator()
+            # tree_unflatten omitted _use_mpc pre-fix; set it defensively.
+            if not hasattr(emu_calc, '_use_mpc'):
+                emu_calc._use_mpc = False
+            replace(obs, theory.pt, emu_calc)
 
 print('All theories emulated' if set_emulator else 'EMULATOR NOT ACTIVATED')
 
