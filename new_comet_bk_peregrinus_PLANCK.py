@@ -488,7 +488,7 @@ if set_emulator:
             else:
                 print(f"Fitting {comp.upper()} emulator for {tracer} -> {emu_fn} "
                       f"(no cache covers k-cuts={req})")
-                emu_checkpoint = emu_fn.replace('_derived.h5', '_checkpoint.npz')
+                emu_checkpoint = emu_fn.replace('.h5', '_checkpoint.npz')
                 emulator = Emulator(theory.pt, Space(theory.pt), budget=4)
                 emulator.train(checkpoint=emu_checkpoint)
                 if MPI.COMM_WORLD.rank == 0:
