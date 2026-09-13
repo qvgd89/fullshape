@@ -56,7 +56,8 @@ from desilike.theories import CosmoprimoCosmology
 from desilike.theories.galaxy_clustering import (
     DirectSpectrum2Template, ShapeFitSpectrum2Template,
     REPTVelocileptorsTracerSpectrum2Poles,
-    FOLPSPTSpectrum2Poles, FOLPSTracerSpectrum2Poles, FOLPSTracerSpectrum3Poles)
+    FOLPSPTSpectrum2Poles, FOLPSTracerSpectrum2Poles, FOLPSTracerSpectrum3Poles,
+    COMETPTSpectrum2Poles, COMETTracerSpectrum2Poles, COMETTracerSpectrum3Poles)
 from desilike.theories.galaxy_clustering.full_shape import get_physical_stochastic_settings
 from desilike.observables.galaxy_clustering import Spectrum2PolesObservable, Spectrum3PolesObservable
 from desilike.likelihoods import ObservablesGaussianLikelihood
@@ -157,7 +158,7 @@ width_EFT = 12.5
 width_SN0 = 2.0
 width_SN2 = 5.0
 
-set_emulator = False
+set_emulator = True
 A_full_status = args.A_full          # CLI toggle (default False); True trains its own emulator
 b3_coev = False
 
@@ -274,13 +275,13 @@ for p in cosmo_vc:
         # p.update(fixed=False, prior={'dist': 'norm', 'loc': simulation_omega_b, 'scale': 0.00055})
         p.update(fixed=True, value=simulation_omega_b)   # Simulation value
     elif name == 'h':
-        p.update(fixed=False, prior={'dist': 'uniform', 'limits': [0.5, 0.9]})
+        p.update(fixed=False, prior={'dist': 'uniform', 'limits': [0.5, 0.9]}, fd={'limits': [0.5, 0.9]})
     elif name == 'omega_cdm':
-        p.update(fixed=False, prior={'dist': 'uniform', 'limits': [0.05, 0.2]})
+        p.update(fixed=False, prior={'dist': 'uniform', 'limits': [0.081, 0.159]}, fd={'limits': [0.081, 0.159]})
     elif name == 'logA':
-        p.update(fixed=False, prior={'dist': 'uniform', 'limits': [2.0, 4.0]})
+        p.update(fixed=False, prior={'dist': 'uniform', 'limits': [2.303, 3.555]}, fd={'limits': [2.303, 3.555]})
     elif name == 'm_ncdm':
-        p.update(fixed=False, prior={'dist': 'uniform', 'limits': [-0.33333, 0.33333]}, fd={'eps': 0.16})
+        p.update(fixed=False, prior={'dist': 'uniform', 'limits': [0.00001, 0.33333]}, fd={'limits': [0.00001, 0.33333]})
         # p.update(fixed=False, prior={'dist': 'uniform', 'limits': [-0.33333, 0.33333]}, fd={'eps': [0.00333, 0.16, 0.16]})
         # p.update(fixed=False, prior={'dist': 'uniform', 'limits': [0, 0.33333]}, fd={'eps': 0.07})
 
@@ -325,8 +326,9 @@ for tracer in tracers:
                                                           prior_basis=prior_basis, nbar=nbar)
     elif pt_model == 'comet':
         pt = COMETPTSpectrum2Poles(A_full=A_full_status)
-        ps_theory = COMETTracerSpectrum2Poles(template=template, pt=pt, tracers=tracer,
-                                              prior_basis=prior_basis, damping=damping, nbar=nbar)
+        ps_theory = COMETTracerSpectrum2Poles(fiducial=fiducial, cosmo=cosmo, z=z,
+                                              pt=pt, tracers=tracer,
+                                              prior_basis=prior_basis, nbar=nbar)
     else:
         pt = FOLPSPTSpectrum2Poles(A_full=A_full_status)
         ps_theory = FOLPSTracerSpectrum2Poles(template=template, pt=pt, tracers=tracer,
